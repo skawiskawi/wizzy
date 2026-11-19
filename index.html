@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello World</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0a0a;
+      --fg: #f5f5f5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, sans-serif;
+
+      & h1 {
+        font-size: clamp(2rem, 6vw, 4rem);
+        letter-spacing: -0.03em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Hello World</h1>
+</body>
+</html>
