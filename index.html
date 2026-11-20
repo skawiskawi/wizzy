@@ -1,3 +1,4 @@
+<!-- version: 0.1 -->
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -12,7 +13,7 @@
     (() => {
       const saved = localStorage.getItem('wizzy-theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = saved || (prefersDark ? 'dark' : 'light');
+      const theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
       document.documentElement.dataset.theme = theme;
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.setAttribute('content', theme === 'dark' ? '#1c1429' : '#cbb9ff');
@@ -21,7 +22,12 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="gradient" aria-hidden="true"></canvas>
+  <div class="bg-stage" aria-hidden="true">
+    <canvas id="gradient"></canvas>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
 
   <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Przełącz tryb jasny/ciemny">
     <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -76,8 +82,6 @@
   <footer>come stai</footer>
 
   <script type="module">
-    import { NeatGradient } from 'https://esm.sh/@firecms/neat@0.3.3';
-
     const THEME_KEY = 'wizzy-theme';
     const root = document.documentElement;
     const toggleBtn = document.getElementById('theme-toggle');
@@ -89,69 +93,89 @@
         meta: '#cbb9ff',
         colors: [
           { color: '#cbb9ff', enabled: true },
-          { color: '#ede4ff', enabled: true },
-          { color: '#a887ff', enabled: true },
-          { color: '#dfceff', enabled: true },
-          { color: '#b799ff', enabled: true }
+          { color: '#f1eaff', enabled: true },
+          { color: '#9c73ff', enabled: true },
+          { color: '#dfd0ff', enabled: true },
+          { color: '#b490ff', enabled: true }
         ]
       },
       dark: {
         meta: '#1c1429',
         colors: [
           { color: '#1c1429', enabled: true },
-          { color: '#392854', enabled: true },
-          { color: '#61448f', enabled: true },
-          { color: '#281c3b', enabled: true },
-          { color: '#4d3673', enabled: true }
+          { color: '#422c66', enabled: true },
+          { color: '#784eb8', enabled: true },
+          { color: '#271a3d', enabled: true },
+          { color: '#593b8a', enabled: true }
         ]
       }
     };
 
-    const initialTheme = root.dataset.theme || 'light';
+    let neat = null;
 
-    const neat = new NeatGradient({
-      ref: canvas,
-      colors: PALETTES[initialTheme].colors,
-      speed: 4.5,
-      horizontalPressure: 4,
-      verticalPressure: 5,
-      waveFrequencyX: 2,
-      waveFrequencyY: 3,
-      waveAmplitude: 5,
-      shadows: 4,
-      highlights: 5,
-      colorBrightness: 1,
-      colorSaturation: 2,
-      wireframe: false,
-      colorBlending: 7,
-      backgroundColor: PALETTES[initialTheme].meta,
-      backgroundAlpha: 1,
-      grainScale: 2,
-      grainSparsity: 0,
-      grainIntensity: 0.08,
-      grainSpeed: 1,
-      resolution: 1
-    });
+    const getActiveTheme = () => (root.dataset.theme === 'dark' ? 'dark' : 'light');
 
     const applyTheme = (theme, persist = false) => {
-      root.dataset.theme = theme;
-      if (persist) localStorage.setItem(THEME_KEY, theme);
-      const palette = PALETTES[theme];
+      const normalized = theme === 'dark' ? 'dark' : 'light';
+      root.dataset.theme = normalized;
+      if (persist) {
+        try {
+          localStorage.setItem(THEME_KEY, normalized);
+        } catch {}
+      }
+      const palette = PALETTES[normalized];
       if (metaTheme) metaTheme.setAttribute('content', palette.meta);
-      neat.colors = palette.colors;
-      neat.backgroundColor = palette.meta;
+      if (neat) {
+        neat.colors = palette.colors;
+        neat.backgroundColor = palette.meta;
+      }
     };
 
-    toggleBtn.addEventListener('click', () => {
-      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    toggleBtn?.addEventListener('click', (event) => {
+      event.preventDefault();
+      const next = getActiveTheme() === 'dark' ? 'light' : 'dark';
       applyTheme(next, true);
     });
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (!localStorage.getItem(THEME_KEY)) {
+      let hasSaved = false;
+      try {
+        hasSaved = Boolean(localStorage.getItem(THEME_KEY));
+      } catch {}
+      if (!hasSaved) {
         applyTheme(e.matches ? 'dark' : 'light', false);
       }
     });
+
+    try {
+      const { NeatGradient } = await import('https://esm.sh/@firecms/neat@0.3.3');
+      const initial = getActiveTheme();
+      neat = new NeatGradient({
+        ref: canvas,
+        colors: PALETTES[initial].colors,
+        speed: 8,
+        horizontalPressure: 5,
+        verticalPressure: 6,
+        waveFrequencyX: 3,
+        waveFrequencyY: 4,
+        waveAmplitude: 8,
+        shadows: 5,
+        highlights: 6,
+        colorBrightness: 1,
+        colorSaturation: 2.2,
+        wireframe: false,
+        colorBlending: 8,
+        backgroundColor: PALETTES[initial].meta,
+        backgroundAlpha: 1,
+        grainScale: 2,
+        grainSparsity: 0,
+        grainIntensity: 0.08,
+        grainSpeed: 1,
+        resolution: 1
+      });
+    } catch {
+      neat = null;
+    }
   </script>
 </body>
 </html>

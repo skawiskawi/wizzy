@@ -1,26 +1,33 @@
+/* version: 0.1 */
 :root {
   --bg-fallback: #cbb9ff;
-  --glass-bg: rgba(255, 255, 255, 0.32);
-  --glass-bg-hover: rgba(255, 255, 255, 0.52);
-  --glass-border: rgba(255, 255, 255, 0.58);
-  --glass-border-hover: rgba(255, 255, 255, 0.9);
-  --glass-shadow: 0 8px 32px rgba(86, 49, 158, 0.12);
-  --glass-shadow-hover: 0 16px 40px rgba(86, 49, 158, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.34);
+  --glass-bg-hover: rgba(255, 255, 255, 0.56);
+  --glass-border: rgba(255, 255, 255, 0.62);
+  --glass-border-hover: rgba(255, 255, 255, 0.92);
+  --glass-shadow: 0 8px 32px rgba(86, 49, 158, 0.14);
+  --glass-shadow-hover: 0 16px 40px rgba(86, 49, 158, 0.22);
   --text-main: #351f5e;
   --text-footer: #f4eeff;
+  --blob-1: rgba(242, 234, 255, 0.78);
+  --blob-2: rgba(154, 114, 255, 0.72);
+  --blob-3: rgba(214, 192, 255, 0.78);
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root[data-theme="dark"] {
   --bg-fallback: #1c1429;
-  --glass-bg: rgba(34, 24, 52, 0.44);
-  --glass-bg-hover: rgba(54, 38, 82, 0.62);
-  --glass-border: rgba(208, 186, 255, 0.2);
-  --glass-border-hover: rgba(226, 212, 255, 0.45);
-  --glass-shadow: 0 8px 32px rgba(10, 6, 18, 0.45);
-  --glass-shadow-hover: 0 16px 40px rgba(10, 6, 18, 0.6);
+  --glass-bg: rgba(34, 24, 52, 0.48);
+  --glass-bg-hover: rgba(56, 39, 86, 0.68);
+  --glass-border: rgba(208, 186, 255, 0.24);
+  --glass-border-hover: rgba(226, 212, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(10, 6, 18, 0.48);
+  --glass-shadow-hover: 0 16px 40px rgba(10, 6, 18, 0.65);
   --text-main: #f2ebff;
   --text-footer: #cbb8f0;
+  --blob-1: rgba(124, 80, 191, 0.65);
+  --blob-2: rgba(62, 41, 97, 0.82);
+  --blob-3: rgba(145, 98, 219, 0.52);
 }
 
 *, *::before, *::after {
@@ -44,16 +51,79 @@ body {
   background-color: var(--bg-fallback);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  transition: color 0.35s ease, background-color 0.35s ease;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.bg-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 #gradient {
-  position: fixed;
+  position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
-  pointer-events: none;
+  display: block;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(48px);
+  will-change: transform;
+  mix-blend-mode: normal;
+}
+
+.blob-1 {
+  width: 72vw;
+  height: 72vw;
+  min-width: 280px;
+  min-height: 280px;
+  top: -15%;
+  left: -15%;
+  background: radial-gradient(circle, var(--blob-1) 0%, transparent 70%);
+  animation: orbit-1 8s ease-in-out infinite alternate;
+}
+
+.blob-2 {
+  width: 78vw;
+  height: 78vw;
+  min-width: 300px;
+  min-height: 300px;
+  bottom: -20%;
+  right: -18%;
+  background: radial-gradient(circle, var(--blob-2) 0%, transparent 70%);
+  animation: orbit-2 10s ease-in-out infinite alternate;
+}
+
+.blob-3 {
+  width: 64vw;
+  height: 64vw;
+  min-width: 250px;
+  min-height: 250px;
+  top: 28%;
+  left: 18%;
+  background: radial-gradient(circle, var(--blob-3) 0%, transparent 70%);
+  animation: orbit-3 7s ease-in-out infinite alternate;
+}
+
+@keyframes orbit-1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(42vw, 28vh, 0) scale(1.18); }
+}
+
+@keyframes orbit-2 {
+  0% { transform: translate3d(0, 0, 0) scale(1.12); }
+  100% { transform: translate3d(-44vw, -30vh, 0) scale(0.92); }
+}
+
+@keyframes orbit-3 {
+  0% { transform: translate3d(-18vw, -12vh, 0) scale(0.95); }
+  100% { transform: translate3d(26vw, 22vh, 0) scale(1.22); }
 }
 
 #gradient + a,
@@ -67,7 +137,7 @@ a[href*="firecms"] {
   position: fixed;
   top: clamp(1rem, 3.5vw, 1.75rem);
   right: clamp(1rem, 3.5vw, 1.75rem);
-  z-index: 10;
+  z-index: 20;
   width: 44px;
   height: 44px;
   display: grid;
@@ -80,6 +150,7 @@ a[href*="firecms"] {
   backdrop-filter: blur(18px) saturate(135%);
   -webkit-backdrop-filter: blur(18px) saturate(135%);
   cursor: pointer;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition:
     transform 0.3s var(--ease-spring),
@@ -90,6 +161,7 @@ a[href*="firecms"] {
   & svg {
     width: 20px;
     height: 20px;
+    pointer-events: none;
   }
 
   & .icon-sun {
