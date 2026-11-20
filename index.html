@@ -15,13 +15,13 @@
       const theme = saved || (prefersDark ? 'dark' : 'light');
       document.documentElement.dataset.theme = theme;
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', theme === 'dark' ? '#251e35' : '#cbb9ff');
+      if (meta) meta.setAttribute('content', theme === 'dark' ? '#1c1429' : '#cbb9ff');
     })();
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="granim-canvas" aria-hidden="true"></canvas>
+  <canvas id="gradient" aria-hidden="true"></canvas>
 
   <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Przełącz tryb jasny/ciemny">
     <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -75,7 +75,83 @@
 
   <footer>come stai</footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/granim@2.0.0/dist/granim.min.js"></script>
-  <script type="module" src="app.js"></script>
+  <script type="module">
+    import { NeatGradient } from 'https://esm.sh/@firecms/neat@0.3.3';
+
+    const THEME_KEY = 'wizzy-theme';
+    const root = document.documentElement;
+    const toggleBtn = document.getElementById('theme-toggle');
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const canvas = document.getElementById('gradient');
+
+    const PALETTES = {
+      light: {
+        meta: '#cbb9ff',
+        colors: [
+          { color: '#cbb9ff', enabled: true },
+          { color: '#ede4ff', enabled: true },
+          { color: '#a887ff', enabled: true },
+          { color: '#dfceff', enabled: true },
+          { color: '#b799ff', enabled: true }
+        ]
+      },
+      dark: {
+        meta: '#1c1429',
+        colors: [
+          { color: '#1c1429', enabled: true },
+          { color: '#392854', enabled: true },
+          { color: '#61448f', enabled: true },
+          { color: '#281c3b', enabled: true },
+          { color: '#4d3673', enabled: true }
+        ]
+      }
+    };
+
+    const initialTheme = root.dataset.theme || 'light';
+
+    const neat = new NeatGradient({
+      ref: canvas,
+      colors: PALETTES[initialTheme].colors,
+      speed: 4.5,
+      horizontalPressure: 4,
+      verticalPressure: 5,
+      waveFrequencyX: 2,
+      waveFrequencyY: 3,
+      waveAmplitude: 5,
+      shadows: 4,
+      highlights: 5,
+      colorBrightness: 1,
+      colorSaturation: 2,
+      wireframe: false,
+      colorBlending: 7,
+      backgroundColor: PALETTES[initialTheme].meta,
+      backgroundAlpha: 1,
+      grainScale: 2,
+      grainSparsity: 0,
+      grainIntensity: 0.08,
+      grainSpeed: 1,
+      resolution: 1
+    });
+
+    const applyTheme = (theme, persist = false) => {
+      root.dataset.theme = theme;
+      if (persist) localStorage.setItem(THEME_KEY, theme);
+      const palette = PALETTES[theme];
+      if (metaTheme) metaTheme.setAttribute('content', palette.meta);
+      neat.colors = palette.colors;
+      neat.backgroundColor = palette.meta;
+    };
+
+    toggleBtn.addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(next, true);
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem(THEME_KEY)) {
+        applyTheme(e.matches ? 'dark' : 'light', false);
+      }
+    });
+  </script>
 </body>
 </html>
