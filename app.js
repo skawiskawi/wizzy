@@ -7,26 +7,28 @@ const currentTheme = root.dataset.theme || 'light';
 
 const granimInstance = new window.Granim({
   element: '#granim-canvas',
-  direction: 'left-right',
+  direction: 'diagonal',
   isPausedWhenNotInView: true,
   defaultStateName: currentTheme === 'dark' ? 'dark-state' : 'light-state',
   stateTransitionSpeed: 500,
   states: {
     'light-state': {
       gradients: [
-        ['#ede4ff', '#cbb9ff', '#b294ff'],
-        ['#b294ff', '#dfd1ff', '#f3ecff'],
-        ['#d5c2ff', '#a786ff', '#e7dbff']
+        ['#ede4ff', '#bfa3ff'],
+        ['#d8c7ff', '#a987ff'],
+        ['#c6b0ff', '#f0e7ff'],
+        ['#b596ff', '#dfd2ff']
       ],
-      transitionSpeed: 2800
+      transitionSpeed: 3000
     },
     'dark-state': {
       gradients: [
-        ['#251e35', '#433361', '#6b5294'],
-        ['#5c4582', '#2c2340', '#7d62ab'],
-        ['#382b52', '#70569c', '#211a30']
+        ['#211a30', '#4a386e'],
+        ['#3a2b57', '#664e91'],
+        ['#523e78', '#251e35'],
+        ['#2c2240', '#5b4585']
       ],
-      transitionSpeed: 2800
+      transitionSpeed: 3000
     }
   }
 });
