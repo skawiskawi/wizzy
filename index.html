@@ -15,43 +15,33 @@
       const theme = saved || (prefersDark ? 'dark' : 'light');
       document.documentElement.dataset.theme = theme;
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', theme === 'dark' ? '#12071c' : '#cbb9ff');
+      if (meta) meta.setAttribute('content', theme === 'dark' ? '#251e35' : '#cbb9ff');
     })();
   </script>
   <style>
     :root {
-      --bg-base: #cbb9ff;
-      --band-1: linear-gradient(180deg, #ece3ff 0%, #c4abff 50%, #e1d2ff 100%);
-      --band-2: linear-gradient(180deg, #b596ff 0%, #dfd0ff 55%, #c9b0ff 100%);
-      --band-3: linear-gradient(180deg, #f3ecff 0%, #ccaaff 50%, #b999ff 100%);
-
+      --bg-fallback: #cbb9ff;
       --glass-bg: rgba(255, 255, 255, 0.34);
       --glass-bg-hover: rgba(255, 255, 255, 0.54);
       --glass-border: rgba(255, 255, 255, 0.58);
       --glass-border-hover: rgba(255, 255, 255, 0.88);
       --glass-shadow: 0 8px 32px rgba(93, 55, 168, 0.12);
       --glass-shadow-hover: 0 14px 36px rgba(93, 55, 168, 0.18);
-
       --text-main: #3b2466;
-      --text-footer: #efe8ff;
+      --text-footer: #f2ecff;
       --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     :root[data-theme="dark"] {
-      --bg-base: #12071c;
-      --band-1: linear-gradient(180deg, #4b1d73 0%, #260d3d 55%, #3c155e 100%);
-      --band-2: linear-gradient(180deg, #68289c 0%, #32114f 50%, #1d0930 100%);
-      --band-3: linear-gradient(180deg, #2d0f47 0%, #582085 50%, #190729 100%);
-
-      --glass-bg: rgba(38, 16, 58, 0.48);
-      --glass-bg-hover: rgba(62, 26, 94, 0.64);
-      --glass-border: rgba(206, 166, 255, 0.2);
-      --glass-border-hover: rgba(220, 188, 255, 0.42);
-      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-      --glass-shadow-hover: 0 14px 36px rgba(0, 0, 0, 0.6);
-
-      --text-main: #f3e8ff;
-      --text-footer: #b68df0;
+      --bg-fallback: #251e35;
+      --glass-bg: rgba(37, 30, 53, 0.42);
+      --glass-bg-hover: rgba(58, 46, 84, 0.58);
+      --glass-border: rgba(212, 194, 255, 0.22);
+      --glass-border-hover: rgba(226, 212, 255, 0.45);
+      --glass-shadow: 0 8px 32px rgba(15, 10, 26, 0.38);
+      --glass-shadow-hover: 0 14px 36px rgba(15, 10, 26, 0.52);
+      --text-main: #f0e8ff;
+      --text-footer: #c7b5eb;
     }
 
     *, *::before, *::after {
@@ -72,68 +62,22 @@
       padding: clamp(1.25rem, 4vw, 2.5rem);
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       color: var(--text-main);
-      background-color: var(--bg-base);
+      background-color: var(--bg-fallback);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       transition: color 0.4s ease, background-color 0.4s ease;
     }
 
-    /* Płynące pasma gradientu linearnego (~1/3 szerokości każde) */
-    .bg-flow {
+    #granim-canvas {
       position: fixed;
       inset: 0;
+      width: 100%;
+      height: 100%;
       z-index: 0;
-      overflow: hidden;
       pointer-events: none;
     }
 
-    .bg-band {
-      position: absolute;
-      top: -20%;
-      bottom: -20%;
-      width: 36vw;
-      min-width: 240px;
-      border-radius: 999px;
-      filter: blur(75px);
-      opacity: 0.85;
-      will-change: transform;
-      transition: background 0.5s ease;
-
-      &.band-1 {
-        left: -5%;
-        background: var(--band-1);
-        animation: drift-1 18s ease-in-out infinite alternate;
-      }
-
-      &.band-2 {
-        left: 32%;
-        background: var(--band-2);
-        animation: drift-2 22s ease-in-out infinite alternate;
-      }
-
-      &.band-3 {
-        right: -5%;
-        background: var(--band-3);
-        animation: drift-3 20s ease-in-out infinite alternate;
-      }
-    }
-
-    @keyframes drift-1 {
-      0% { transform: translate3d(0, -4%, 0) rotate(-6deg) scale(1); }
-      100% { transform: translate3d(38%, 6%, 0) rotate(4deg) scale(1.12); }
-    }
-
-    @keyframes drift-2 {
-      0% { transform: translate3d(12%, 5%, 0) rotate(5deg) scale(1.08); }
-      100% { transform: translate3d(-32%, -6%, 0) rotate(-5deg) scale(0.96); }
-    }
-
-    @keyframes drift-3 {
-      0% { transform: translate3d(0, 6%, 0) rotate(-4deg) scale(1.04); }
-      100% { transform: translate3d(-40%, -5%, 0) rotate(6deg) scale(1.1); }
-    }
-
-    /* Subtelna tekstura ziarna eliminująca banding gradientów */
+    /* Subtelna tekstura ziarna eliminująca banding gradientu */
     body::before {
       content: "";
       position: fixed;
@@ -311,11 +255,7 @@
   </style>
 </head>
 <body>
-  <div class="bg-flow" aria-hidden="true">
-    <div class="bg-band band-1"></div>
-    <div class="bg-band band-2"></div>
-    <div class="bg-band band-3"></div>
-  </div>
+  <canvas id="granim-canvas" aria-hidden="true"></canvas>
 
   <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Przełącz tryb jasny/ciemny">
     <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -369,16 +309,46 @@
 
   <footer>come stai</footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/granim@2.0.0/dist/granim.min.js"></script>
   <script type="module">
     const THEME_KEY = 'wizzy-theme';
     const root = document.documentElement;
     const toggleBtn = document.getElementById('theme-toggle');
     const metaTheme = document.querySelector('meta[name="theme-color"]');
 
+    const currentTheme = root.dataset.theme || 'light';
+
+    const granimInstance = new window.Granim({
+      element: '#granim-canvas',
+      direction: 'left-right',
+      isPausedWhenNotInView: true,
+      defaultStateName: currentTheme === 'dark' ? 'dark-state' : 'light-state',
+      stateTransitionSpeed: 500,
+      states: {
+        'light-state': {
+          gradients: [
+            ['#ede4ff', '#cbb9ff', '#b294ff'],
+            ['#b294ff', '#dfd1ff', '#f3ecff'],
+            ['#d5c2ff', '#a786ff', '#e7dbff']
+          ],
+          transitionSpeed: 2800
+        },
+        'dark-state': {
+          gradients: [
+            ['#251e35', '#433361', '#6b5294'],
+            ['#5c4582', '#2c2340', '#7d62ab'],
+            ['#382b52', '#70569c', '#211a30']
+          ],
+          transitionSpeed: 2800
+        }
+      }
+    });
+
     const applyTheme = (theme, persist = false) => {
       root.dataset.theme = theme;
       if (persist) localStorage.setItem(THEME_KEY, theme);
-      if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#12071c' : '#cbb9ff');
+      if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#251e35' : '#cbb9ff');
+      granimInstance.changeState(theme === 'dark' ? 'dark-state' : 'light-state');
     };
 
     toggleBtn.addEventListener('click', () => {
